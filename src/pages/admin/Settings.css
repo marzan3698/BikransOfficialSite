@@ -1,0 +1,42 @@
+.settings-section {
+  margin-bottom: 32px;
+}
+
+.settings-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f0f6fc;
+  margin-bottom: 12px;
+}
+
+.settings-card {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.settings-desc {
+  color: #8b949e;
+  line-height: 1.6;
+}
+
+.permissions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: #c9d1d9;
+}
+
+.permissions-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #21262d;
+}
+
+.permissions-list li:last-child {
+  border-bottom: none;
+}
+
+.permissions-list strong {
+  color: #58a6ff;
+}

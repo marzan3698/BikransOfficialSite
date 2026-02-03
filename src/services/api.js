@@ -1,0 +1,277 @@
+const API_BASE = '/api'
+
+function getToken() {
+  return localStorage.getItem('bikrans_token')
+}
+
+async function request(endpoint, options = {}) {
+  const url = `${API_BASE}${endpoint}`
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  }
+  const token = getToken()
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
+  const res = await fetch(url, { ...options, headers })
+  const data = await res.json().catch(() => ({}))
+
+  if (!res.ok) {
+    const message = data.error || data.message || res.statusText || 'Request failed'
+    throw new Error(message)
+  }
+  return data
+}
+
+export const slidersApi = {
+  getPublic: () => request('/sliders'),
+}
+
+export const themeApi = {
+  getHeader: () => request('/theme/header'),
+  getFooter: () => request('/theme/footer'),
+}
+
+export const landingApi = {
+  getPublic: () => request('/public/landing'),
+}
+
+export const authApi = {
+  login: (identifier, password) => {
+    const body = identifier.includes('@')
+      ? { email: identifier, password }
+      : { phone: identifier, password }
+    return request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
+  },
+  register: (data) => request('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  campaignRegister: (data) => request('/auth/campaign-register', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  logout: () => request('/auth/logout', { method: 'POST' }),
+  me: () => request('/auth/me'),
+}
+
+export const adminApi = {
+  getDashboard: () => request('/admin/dashboard'),
+  getUsers: (params) => {
+    const q = new URLSearchParams(params || {}).toString()
+    return request(`/admin/users${q ? '?' + q : ''}`)
+  },
+  createUser: (data) => request('/admin/users', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  updateUser: (id, data) => request(`/admin/users/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  deleteUser: (id) => request(`/admin/users/${id}`, { method: 'DELETE' }),
+  updateUserRole: (id, role) => request(`/admin/users/${id}/role`, {
+    method: 'PUT',
+    body: JSON.stringify({ role }),
+  }),
+  getAnalytics: () => request('/admin/analytics'),
+  getSliders: () => request('/admin/sliders'),
+  createSlider: async (formData) => {
+    const token = getToken()
+    const headers = {}
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(`${API_BASE}/admin/sliders`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to create slider')
+    }
+    return data
+  },
+  updateSlider: async (id, formData) => {
+    const token = getToken()
+    const headers = {}
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(`${API_BASE}/admin/sliders/${id}`, {
+      method: 'PUT',
+      headers,
+      body: formData,
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to update slider')
+    }
+    return data
+  },
+  deleteSlider: (id) => request(`/admin/sliders/${id}`, { method: 'DELETE' }),
+  reorderSliders: (order) => request('/admin/sliders/reorder', {
+    method: 'PUT',
+    body: JSON.stringify({ order }),
+  }),
+  
+  // Theme management
+  getHeaderSettings: () => request('/admin/theme/header'),
+  updateHeaderSettings: (data) => request('/admin/theme/header', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  uploadLogo: async (formData) => {
+    const token = getToken()
+    const headers = {}
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(`${API_BASE}/admin/theme/header/logo`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to upload logo')
+    }
+    return data
+  },
+  getFooterItems: () => request('/admin/theme/footer'),
+  createFooterItem: (data) => request('/admin/theme/footer', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  updateFooterItem: (id, data) => request(`/admin/theme/footer/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  deleteFooterItem: (id) => request(`/admin/theme/footer/${id}`, {
+    method: 'DELETE',
+  }),
+  reorderFooterItems: (order) => request('/admin/theme/footer/reorder', {
+    method: 'PUT',
+    body: JSON.stringify({ order }),
+  }),
+
+  // Task management
+  getTasks: (params) => {
+    const q = new URLSearchParams(params || {}).toString()
+    return request(`/admin/tasks${q ? '?' + q : ''}`)
+  },
+  createTask: (data) => request('/admin/tasks', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  getTask: (id) => request(`/admin/tasks/${id}`),
+  updateTask: (id, data) => request(`/admin/tasks/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  deleteTask: (id) => request(`/admin/tasks/${id}`, { method: 'DELETE' }),
+  addTaskAttachment: async (taskId, formData) => {
+    const token = getToken()
+    const headers = {}
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(`${API_BASE}/admin/tasks/${taskId}/attachments`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to upload file')
+    }
+    return data
+  },
+  deleteTaskAttachment: (taskId, attachmentId) =>
+    request(`/admin/tasks/${taskId}/attachments/${attachmentId}`, { method: 'DELETE' }),
+  addTaskComment: (taskId, message) =>
+    request(`/admin/tasks/${taskId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    }),
+
+  // Landing page design
+  getLandingServices: () => request('/admin/landing/services'),
+  updateLandingServicesSettings: (data) => request('/admin/landing/services', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  createLandingServiceItem: (data) => request('/admin/landing/services/items', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  updateLandingServiceItem: (id, data) => request(`/admin/landing/services/items/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  deleteLandingServiceItem: (id) => request(`/admin/landing/services/items/${id}`, { method: 'DELETE' }),
+  reorderLandingServiceItems: (order) => request('/admin/landing/services/reorder', {
+    method: 'PUT',
+    body: JSON.stringify({ order }),
+  }),
+
+  getLandingFeatures: () => request('/admin/landing/features'),
+  updateLandingFeaturesSettings: (data) => request('/admin/landing/features', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  createLandingFeatureItem: (data) => request('/admin/landing/features/items', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  updateLandingFeatureItem: (id, data) => request(`/admin/landing/features/items/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  deleteLandingFeatureItem: (id) => request(`/admin/landing/features/items/${id}`, { method: 'DELETE' }),
+  reorderLandingFeatureItems: (order) => request('/admin/landing/features/reorder', {
+    method: 'PUT',
+    body: JSON.stringify({ order }),
+  }),
+
+  getLandingCta: () => request('/admin/landing/cta'),
+  updateLandingCta: (data) => request('/admin/landing/cta', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+}
+
+export const tasksApi = {
+  getMyTasks: (params) => {
+    const q = new URLSearchParams(params || {}).toString()
+    return request(`/tasks/my-tasks${q ? '?' + q : ''}`)
+  },
+  getTask: (id) => request(`/tasks/${id}`),
+  updateStatus: (id, status) =>
+    request(`/tasks/${id}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    }),
+  addAttachment: async (taskId, formData) => {
+    const token = getToken()
+    const headers = {}
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const res = await fetch(`${API_BASE}/tasks/${taskId}/attachments`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to upload file')
+    }
+    return data
+  },
+  getAttachments: (taskId) => request(`/tasks/${taskId}/attachments`),
+  deleteAttachment: (taskId, attachmentId) =>
+    request(`/tasks/${taskId}/attachments/${attachmentId}`, { method: 'DELETE' }),
+  addComment: (taskId, message) =>
+    request(`/tasks/${taskId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    }),
+  getComments: (taskId) => request(`/tasks/${taskId}/comments`),
+}

@@ -1,0 +1,143 @@
+import express from 'express'
+import {
+  getDashboard,
+  getUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+  updateUserRole,
+  getAnalytics,
+  createUserValidation
+} from '../controllers/adminController.js'
+import {
+  getAdminSliders,
+  createSlider,
+  updateSlider,
+  deleteSlider,
+  reorderSliders
+} from '../controllers/sliderController.js'
+import {
+  getHeaderSettings,
+  updateHeaderSettings,
+  uploadLogo as uploadLogoController,
+  getAdminFooterNavItems,
+  createFooterNavItem,
+  updateFooterNavItem,
+  deleteFooterNavItem,
+  reorderFooterNavItems,
+} from '../controllers/themeController.js'
+import {
+  listTasks,
+  createTask,
+  getTask,
+  updateTask,
+  deleteTask,
+  addTaskAttachmentAdmin,
+  deleteTaskAttachmentAdmin,
+  addTaskCommentAdmin,
+} from '../controllers/taskController.js'
+import {
+  getServicesSection,
+  updateServicesSettings,
+  createServiceItem,
+  updateServiceItem,
+  deleteServiceItem,
+  reorderServiceItems,
+  getFeaturesSection,
+  updateFeaturesSettings,
+  createFeatureItem,
+  updateFeatureItem,
+  deleteFeatureItem,
+  reorderFeatureItems,
+  getCtaSection,
+  updateCtaSection,
+} from '../controllers/landingController.js'
+import { authMiddleware } from '../middleware/auth.js'
+import { requireAdmin, requireAdminOrManager } from '../middleware/roleCheck.js'
+import { uploadSlider, uploadLogo, uploadTaskAttachment } from '../middleware/upload.js'
+
+const router = express.Router()
+
+router.use(authMiddleware)
+
+router.get('/dashboard', requireAdminOrManager, getDashboard)
+router.get('/users', requireAdminOrManager, getUsers)
+router.post('/users', requireAdmin, createUserValidation, createUser)
+router.put('/users/:id', requireAdminOrManager, updateUser)
+router.delete('/users/:id', requireAdmin, deleteUser)
+router.put('/users/:id/role', requireAdmin, updateUserRole)
+router.get('/analytics', requireAdminOrManager, getAnalytics)
+
+router.get('/sliders', requireAdminOrManager, getAdminSliders)
+router.post('/sliders', requireAdminOrManager, (req, res, next) => {
+  uploadSlider(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message || 'File upload failed' })
+    }
+    next()
+  })
+}, createSlider)
+// IMPORTANT: reorder route must come BEFORE :id routes
+router.put('/sliders/reorder', requireAdminOrManager, reorderSliders)
+router.put('/sliders/:id', requireAdminOrManager, (req, res, next) => {
+  uploadSlider(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message || 'File upload failed' })
+    }
+    next()
+  })
+}, updateSlider)
+router.delete('/sliders/:id', requireAdminOrManager, deleteSlider)
+
+// Theme management routes
+router.get('/theme/header', requireAdminOrManager, getHeaderSettings)
+router.put('/theme/header', requireAdminOrManager, updateHeaderSettings)
+router.post('/theme/header/logo', requireAdminOrManager, (req, res, next) => {
+  uploadLogo(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message || 'Logo upload failed' })
+    }
+    next()
+  })
+}, uploadLogoController)
+
+router.get('/theme/footer', requireAdminOrManager, getAdminFooterNavItems)
+router.post('/theme/footer', requireAdminOrManager, createFooterNavItem)
+router.put('/theme/footer/reorder', requireAdminOrManager, reorderFooterNavItems)
+router.put('/theme/footer/:id', requireAdminOrManager, updateFooterNavItem)
+router.delete('/theme/footer/:id', requireAdminOrManager, deleteFooterNavItem)
+
+// Task management (admin)
+router.get('/tasks', requireAdminOrManager, listTasks)
+router.post('/tasks', requireAdminOrManager, createTask)
+router.get('/tasks/:id', requireAdminOrManager, getTask)
+router.put('/tasks/:id', requireAdminOrManager, updateTask)
+router.delete('/tasks/:id', requireAdminOrManager, deleteTask)
+router.post('/tasks/:id/attachments', requireAdminOrManager, (req, res, next) => {
+  uploadTaskAttachment(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message || 'File upload failed' })
+    next()
+  })
+}, addTaskAttachmentAdmin)
+router.delete('/tasks/:id/attachments/:attachmentId', requireAdminOrManager, deleteTaskAttachmentAdmin)
+router.post('/tasks/:id/comments', requireAdminOrManager, addTaskCommentAdmin)
+
+// Landing page design (Theme Design > ল্যান্ডিং পেজ ডিজাইন)
+router.get('/landing/services', requireAdminOrManager, getServicesSection)
+router.put('/landing/services', requireAdminOrManager, updateServicesSettings)
+router.post('/landing/services/items', requireAdminOrManager, createServiceItem)
+router.put('/landing/services/items/:id', requireAdminOrManager, updateServiceItem)
+router.delete('/landing/services/items/:id', requireAdminOrManager, deleteServiceItem)
+router.put('/landing/services/reorder', requireAdminOrManager, reorderServiceItems)
+
+router.get('/landing/features', requireAdminOrManager, getFeaturesSection)
+router.put('/landing/features', requireAdminOrManager, updateFeaturesSettings)
+router.post('/landing/features/items', requireAdminOrManager, createFeatureItem)
+router.put('/landing/features/items/:id', requireAdminOrManager, updateFeatureItem)
+router.delete('/landing/features/items/:id', requireAdminOrManager, deleteFeatureItem)
+router.put('/landing/features/reorder', requireAdminOrManager, reorderFeatureItems)
+
+router.get('/landing/cta', requireAdminOrManager, getCtaSection)
+router.put('/landing/cta', requireAdminOrManager, updateCtaSection)
+
+export default router

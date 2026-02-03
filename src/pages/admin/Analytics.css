@@ -1,0 +1,88 @@
+.chart-section {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.chart-section h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f0f6fc;
+  margin-bottom: 20px;
+}
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  height: 200px;
+}
+
+.bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.bar-fill {
+  width: 100%;
+  max-width: 40px;
+  background: #238636;
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+}
+
+.bar-label {
+  font-size: 0.7rem;
+  color: #8b949e;
+  margin-top: 8px;
+}
+
+.bar-value {
+  font-size: 0.85rem;
+  color: #c9d1d9;
+  font-weight: 600;
+}
+
+.empty-state {
+  color: #8b949e;
+  padding: 40px;
+  text-align: center;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stats-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #21262d;
+  color: #c9d1d9;
+}
+
+.stats-list li:last-child {
+  border-bottom: none;
+}
+
+.role-name {
+  text-transform: capitalize;
+}
+
+.role-count {
+  font-weight: 600;
+  color: #f0f6fc;
+}

@@ -1,0 +1,101 @@
+.admin-login-page {
+  min-height: 100vh;
+  background: #0d1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.admin-login-box {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.admin-login-logo {
+  display: block;
+  height: 40px;
+  width: auto;
+  margin: 0 auto 24px;
+  filter: brightness(0) invert(1);
+}
+
+.admin-login-box h1 {
+  font-size: 1.5rem;
+  color: #f0f6fc;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.admin-login-sub {
+  font-size: 0.9rem;
+  color: #8b949e;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.admin-login-box input {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #c9d1d9;
+}
+
+.admin-login-box input::placeholder {
+  color: #8b949e;
+}
+
+.admin-login-box button[type="submit"] {
+  width: 100%;
+  padding: 12px 16px;
+  margin-top: 8px;
+  background: #238636;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-login-box button[type="submit"]:hover:not(:disabled) {
+  background: #2ea043;
+}
+
+.admin-login-box button[type="submit"]:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.admin-login-error {
+  background: rgba(248, 81, 73, 0.15);
+  border: 1px solid #f85149;
+  color: #f85149;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.admin-back-btn {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: #58a6ff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.admin-back-btn:hover {
+  text-decoration: underline;
+}
