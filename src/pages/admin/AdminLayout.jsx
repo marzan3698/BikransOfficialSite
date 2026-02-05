@@ -28,6 +28,7 @@ function AdminLayout({ children, user, onLogout, activeTab, onTabChange }) {
     { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
     { id: 'users', label: 'User Management', icon: 'users' },
     { id: 'tasks', label: 'Task Management', icon: 'tasks' },
+    { id: 'projects', label: 'প্রজেক্ট ম্যানেজমেন্ট', icon: 'projects' },
     { id: 'analytics', label: 'Analytics', icon: 'analytics' },
     {
       id: 'theme-design',
@@ -103,6 +104,11 @@ function AdminLayout({ children, user, onLogout, activeTab, onTabChange }) {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
           <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+        </svg>
+      ),
+      projects: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
         </svg>
       ),
       settings: (

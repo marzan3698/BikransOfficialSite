@@ -250,3 +250,85 @@ export async function getAnalytics(req, res) {
     res.status(500).json({ error: 'Failed to get analytics' })
   }
 }
+
+// Project Management
+export async function getProjects(req, res) {
+  try {
+    const projects = await query('SELECT id, code, name, created_at FROM projects ORDER BY created_at DESC')
+    res.json(projects)
+  } catch (err) {
+    console.error('Get projects error:', err)
+    res.status(500).json({ error: 'Failed to get projects' })
+  }
+}
+
+export async function createProject(req, res) {
+  try {
+    const { code, name } = req.body
+
+    if (!code || !name) {
+      return res.status(400).json({ error: 'Code and name are required' })
+    }
+
+    // Check if code already exists
+    const existing = await query('SELECT id FROM projects WHERE code = ?', [code])
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'Project code already exists' })
+    }
+
+    await query('INSERT INTO projects (code, name) VALUES (?, ?)', [code, name])
+
+    const [project] = await query(
+      'SELECT id, code, name, created_at FROM projects WHERE id = LAST_INSERT_ID()'
+    )
+    res.status(201).json(project)
+  } catch (err) {
+    console.error('Create project error:', err)
+    res.status(500).json({ error: 'Failed to create project' })
+  }
+}
+
+export async function updateProject(req, res) {
+  try {
+    const id = parseInt(req.params.id)
+    const { name } = req.body
+
+    if (!name) {
+      return res.status(400).json({ error: 'Name is required' })
+    }
+
+    const result = await query('UPDATE projects SET name = ? WHERE id = ?', [name, id])
+    const affectedRows = result?.affectedRows ?? 0
+
+    if (affectedRows === 0) {
+      return res.status(404).json({ error: 'Project not found' })
+    }
+
+    const [project] = await query(
+      'SELECT id, code, name, created_at FROM projects WHERE id = ?',
+      [id]
+    )
+    res.json(project)
+  } catch (err) {
+    console.error('Update project error:', err)
+    res.status(500).json({ error: 'Failed to update project' })
+  }
+}
+
+export async function deleteProject(req, res) {
+  try {
+    const id = parseInt(req.params.id)
+
+    const result = await query('DELETE FROM projects WHERE id = ?', [id])
+    const affectedRows = result?.affectedRows ?? 0
+
+    if (affectedRows === 0) {
+      return res.status(404).json({ error: 'Project not found' })
+    }
+
+    res.json({ message: 'Project deleted successfully' })
+  } catch (err) {
+    console.error('Delete project error:', err)
+    res.status(500).json({ error: 'Failed to delete project' })
+  }
+}

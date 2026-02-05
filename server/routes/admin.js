@@ -7,7 +7,11 @@ import {
   deleteUser,
   updateUserRole,
   getAnalytics,
-  createUserValidation
+  createUserValidation,
+  getProjects,
+  createProject,
+  updateProject,
+  deleteProject
 } from '../controllers/adminController.js'
 import {
   getAdminSliders,
@@ -148,5 +152,11 @@ router.put('/landing/features/reorder', requireAdminOrManager, reorderFeatureIte
 
 router.get('/landing/cta', requireAdminOrManager, getCtaSection)
 router.put('/landing/cta', requireAdminOrManager, updateCtaSection)
+
+// Project management
+router.get('/projects', requireAdminOrManager, getProjects)
+router.post('/projects', requireAdminOrManager, createProject)
+router.put('/projects/:id', requireAdminOrManager, updateProject)
+router.delete('/projects/:id', requireAdminOrManager, deleteProject)
 
 export default router

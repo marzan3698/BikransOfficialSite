@@ -118,7 +118,7 @@ export const adminApi = {
     method: 'PUT',
     body: JSON.stringify({ order }),
   }),
-  
+
   // Theme management
   getHeaderSettings: () => request('/admin/theme/header'),
   updateHeaderSettings: (data) => request('/admin/theme/header', {
@@ -257,6 +257,18 @@ export const adminApi = {
     method: 'PUT',
     body: JSON.stringify(data),
   }),
+
+  // Project management
+  getProjects: () => request('/admin/projects'),
+  createProject: (data) => request('/admin/projects', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  updateProject: (id, data) => request(`/admin/projects/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  deleteProject: (id) => request(`/admin/projects/${id}`, { method: 'DELETE' }),
 }
 
 export const tasksApi = {

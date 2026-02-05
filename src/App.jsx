@@ -17,6 +17,7 @@ import HeaderManagement from './pages/admin/HeaderManagement'
 import FooterManagement from './pages/admin/FooterManagement'
 import TaskManagement from './pages/admin/TaskManagement'
 import LandingPageManagement from './pages/admin/LandingPageManagement'
+import ProjectManagement from './pages/admin/ProjectManagement'
 
 function getInitialPage() {
   const path = window.location.pathname
@@ -34,7 +35,7 @@ function App() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
-  
+
   // Theme settings
   const [headerSettings, setHeaderSettings] = useState({
     logo_image: '/BIKRANS-FINAL.png',
@@ -149,7 +150,7 @@ function App() {
           show_footer: data.show_footer !== undefined ? Boolean(data.show_footer) : true,
         })
       })
-      .catch(() => {})
+      .catch(() => { })
 
     themeApi.getFooter()
       .then((data) => {
@@ -157,7 +158,7 @@ function App() {
           setFooterItems(data)
         }
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   useEffect(() => {
@@ -173,7 +174,7 @@ function App() {
           })))
         }
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [currentPage])
 
   useEffect(() => {
@@ -184,7 +185,7 @@ function App() {
           setLandingData(data)
         }
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [currentPage])
 
   const landing = landingData || defaultLanding
@@ -219,7 +220,7 @@ function App() {
     try {
       const fullProfile = await authApi.me()
       setUser(fullProfile)
-    } catch (_) {}
+    } catch (_) { }
   }
 
   const handleRegisterSuccess = async (userData) => {
@@ -229,7 +230,7 @@ function App() {
     try {
       const fullProfile = await authApi.me()
       setUser(fullProfile)
-    } catch (_) {}
+    } catch (_) { }
   }
 
   const handleNavigateToRegister = () => setCurrentPage('register')
@@ -288,6 +289,7 @@ function App() {
       dashboard: <AdminDashboard />,
       users: <UserManagement currentUser={adminUser} />,
       tasks: <TaskManagement />,
+      projects: <ProjectManagement />,
       analytics: <Analytics />,
       'theme-sliders': <SliderManagement />,
       'theme-header': <HeaderManagement />,
@@ -391,8 +393,8 @@ function App() {
       setUser(userData)
     }
     return (
-      <TikTokCampaign 
-        onBack={handleCampaignBack} 
+      <TikTokCampaign
+        onBack={handleCampaignBack}
         headerSettings={headerSettings}
         footerItems={footerItems}
         showFooter={headerSettings.show_footer}
@@ -406,17 +408,17 @@ function App() {
   // Home page
   return (
     <div className="app">
-      <header 
-        className="header" 
-        style={{ 
+      <header
+        className="header"
+        style={{
           backgroundColor: headerSettings.header_bg_color,
           height: `${headerSettings.header_height}px`
         }}
       >
         <div className="header-content">
-          <img 
-            src={headerSettings.logo_image} 
-            alt="Bikrans" 
+          <img
+            src={headerSettings.logo_image}
+            alt="Bikrans"
             className="logo"
             style={{ height: `${headerSettings.logo_height}px` }}
           />
@@ -531,9 +533,9 @@ function App() {
       {headerSettings.show_footer && (
         <nav className="bottom-nav">
           {footerItems.map((item, index) => (
-            <a 
-              key={item.id} 
-              href={item.link} 
+            <a
+              key={item.id}
+              href={item.link}
               className={`nav-item ${index === 0 ? 'active' : ''}`}
               onClick={(e) => {
                 if (item.link === '/login') {
