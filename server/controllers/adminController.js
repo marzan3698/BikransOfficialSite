@@ -254,7 +254,14 @@ export async function getAnalytics(req, res) {
 // Project Management
 export async function getProjects(req, res) {
   try {
-    const projects = await query('SELECT id, code, name, created_at FROM projects ORDER BY created_at DESC')
+    const projects = await query(`
+      SELECT id, code, name, youtube_url,
+        mcq1_question, mcq1_option_a, mcq1_option_b, mcq1_option_c, mcq1_option_d, mcq1_answer,
+        mcq2_question, mcq2_option_a, mcq2_option_b, mcq2_option_c, mcq2_option_d, mcq2_answer,
+        mcq3_question, mcq3_option_a, mcq3_option_b, mcq3_option_c, mcq3_option_d, mcq3_answer,
+        created_at
+      FROM projects ORDER BY created_at DESC
+    `)
     res.json(projects)
   } catch (err) {
     console.error('Get projects error:', err)
@@ -264,7 +271,12 @@ export async function getProjects(req, res) {
 
 export async function createProject(req, res) {
   try {
-    const { code, name } = req.body
+    const {
+      code, name, youtube_url,
+      mcq1_question, mcq1_option_a, mcq1_option_b, mcq1_option_c, mcq1_option_d, mcq1_answer,
+      mcq2_question, mcq2_option_a, mcq2_option_b, mcq2_option_c, mcq2_option_d, mcq2_answer,
+      mcq3_question, mcq3_option_a, mcq3_option_b, mcq3_option_c, mcq3_option_d, mcq3_answer
+    } = req.body
 
     if (!code || !name) {
       return res.status(400).json({ error: 'Code and name are required' })
@@ -276,10 +288,22 @@ export async function createProject(req, res) {
       return res.status(400).json({ error: 'Project code already exists' })
     }
 
-    await query('INSERT INTO projects (code, name) VALUES (?, ?)', [code, name])
+    await query(`
+      INSERT INTO projects (
+        code, name, youtube_url,
+        mcq1_question, mcq1_option_a, mcq1_option_b, mcq1_option_c, mcq1_option_d, mcq1_answer,
+        mcq2_question, mcq2_option_a, mcq2_option_b, mcq2_option_c, mcq2_option_d, mcq2_answer,
+        mcq3_question, mcq3_option_a, mcq3_option_b, mcq3_option_c, mcq3_option_d, mcq3_answer
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      code, name, youtube_url || null,
+      mcq1_question || null, mcq1_option_a || null, mcq1_option_b || null, mcq1_option_c || null, mcq1_option_d || null, mcq1_answer || null,
+      mcq2_question || null, mcq2_option_a || null, mcq2_option_b || null, mcq2_option_c || null, mcq2_option_d || null, mcq2_answer || null,
+      mcq3_question || null, mcq3_option_a || null, mcq3_option_b || null, mcq3_option_c || null, mcq3_option_d || null, mcq3_answer || null
+    ])
 
     const [project] = await query(
-      'SELECT id, code, name, created_at FROM projects WHERE id = LAST_INSERT_ID()'
+      'SELECT id, code, name, youtube_url, created_at FROM projects WHERE id = LAST_INSERT_ID()'
     )
     res.status(201).json(project)
   } catch (err) {
@@ -291,13 +315,31 @@ export async function createProject(req, res) {
 export async function updateProject(req, res) {
   try {
     const id = parseInt(req.params.id)
-    const { name } = req.body
+    const {
+      name, youtube_url,
+      mcq1_question, mcq1_option_a, mcq1_option_b, mcq1_option_c, mcq1_option_d, mcq1_answer,
+      mcq2_question, mcq2_option_a, mcq2_option_b, mcq2_option_c, mcq2_option_d, mcq2_answer,
+      mcq3_question, mcq3_option_a, mcq3_option_b, mcq3_option_c, mcq3_option_d, mcq3_answer
+    } = req.body
 
     if (!name) {
       return res.status(400).json({ error: 'Name is required' })
     }
 
-    const result = await query('UPDATE projects SET name = ? WHERE id = ?', [name, id])
+    const result = await query(`
+      UPDATE projects SET
+        name = ?, youtube_url = ?,
+        mcq1_question = ?, mcq1_option_a = ?, mcq1_option_b = ?, mcq1_option_c = ?, mcq1_option_d = ?, mcq1_answer = ?,
+        mcq2_question = ?, mcq2_option_a = ?, mcq2_option_b = ?, mcq2_option_c = ?, mcq2_option_d = ?, mcq2_answer = ?,
+        mcq3_question = ?, mcq3_option_a = ?, mcq3_option_b = ?, mcq3_option_c = ?, mcq3_option_d = ?, mcq3_answer = ?
+      WHERE id = ?
+    `, [
+      name, youtube_url || null,
+      mcq1_question || null, mcq1_option_a || null, mcq1_option_b || null, mcq1_option_c || null, mcq1_option_d || null, mcq1_answer || null,
+      mcq2_question || null, mcq2_option_a || null, mcq2_option_b || null, mcq2_option_c || null, mcq2_option_d || null, mcq2_answer || null,
+      mcq3_question || null, mcq3_option_a || null, mcq3_option_b || null, mcq3_option_c || null, mcq3_option_d || null, mcq3_answer || null,
+      id
+    ])
     const affectedRows = result?.affectedRows ?? 0
 
     if (affectedRows === 0) {
@@ -305,7 +347,11 @@ export async function updateProject(req, res) {
     }
 
     const [project] = await query(
-      'SELECT id, code, name, created_at FROM projects WHERE id = ?',
+      `SELECT id, code, name, youtube_url,
+        mcq1_question, mcq1_option_a, mcq1_option_b, mcq1_option_c, mcq1_option_d, mcq1_answer,
+        mcq2_question, mcq2_option_a, mcq2_option_b, mcq2_option_c, mcq2_option_d, mcq2_answer,
+        mcq3_question, mcq3_option_a, mcq3_option_b, mcq3_option_c, mcq3_option_d, mcq3_answer,
+        created_at FROM projects WHERE id = ?`,
       [id]
     )
     res.json(project)

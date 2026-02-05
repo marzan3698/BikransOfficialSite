@@ -8,9 +8,25 @@ function ProjectManagement() {
     const [error, setError] = useState(null)
     const [showForm, setShowForm] = useState(false)
     const [editingProject, setEditingProject] = useState(null)
-    const [formData, setFormData] = useState({ code: '', name: '' })
+    const [formData, setFormData] = useState({
+        code: '',
+        name: '',
+        youtube_url: '',
+        mcq1_question: '', mcq1_option_a: '', mcq1_option_b: '', mcq1_option_c: '', mcq1_option_d: '', mcq1_answer: '',
+        mcq2_question: '', mcq2_option_a: '', mcq2_option_b: '', mcq2_option_c: '', mcq2_option_d: '', mcq2_answer: '',
+        mcq3_question: '', mcq3_option_a: '', mcq3_option_b: '', mcq3_option_c: '', mcq3_option_d: '', mcq3_answer: ''
+    })
     const [submitting, setSubmitting] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
+
+    const initialFormData = {
+        code: '',
+        name: '',
+        youtube_url: '',
+        mcq1_question: '', mcq1_option_a: '', mcq1_option_b: '', mcq1_option_c: '', mcq1_option_d: '', mcq1_answer: '',
+        mcq2_question: '', mcq2_option_a: '', mcq2_option_b: '', mcq2_option_c: '', mcq2_option_d: '', mcq2_answer: '',
+        mcq3_question: '', mcq3_option_a: '', mcq3_option_b: '', mcq3_option_c: '', mcq3_option_d: '', mcq3_answer: ''
+    }
 
     useEffect(() => {
         fetchProjects()
@@ -32,10 +48,32 @@ function ProjectManagement() {
     const handleOpenForm = (project = null) => {
         if (project) {
             setEditingProject(project)
-            setFormData({ code: project.code, name: project.name })
+            setFormData({
+                code: project.code || '',
+                name: project.name || '',
+                youtube_url: project.youtube_url || '',
+                mcq1_question: project.mcq1_question || '',
+                mcq1_option_a: project.mcq1_option_a || '',
+                mcq1_option_b: project.mcq1_option_b || '',
+                mcq1_option_c: project.mcq1_option_c || '',
+                mcq1_option_d: project.mcq1_option_d || '',
+                mcq1_answer: project.mcq1_answer || '',
+                mcq2_question: project.mcq2_question || '',
+                mcq2_option_a: project.mcq2_option_a || '',
+                mcq2_option_b: project.mcq2_option_b || '',
+                mcq2_option_c: project.mcq2_option_c || '',
+                mcq2_option_d: project.mcq2_option_d || '',
+                mcq2_answer: project.mcq2_answer || '',
+                mcq3_question: project.mcq3_question || '',
+                mcq3_option_a: project.mcq3_option_a || '',
+                mcq3_option_b: project.mcq3_option_b || '',
+                mcq3_option_c: project.mcq3_option_c || '',
+                mcq3_option_d: project.mcq3_option_d || '',
+                mcq3_answer: project.mcq3_answer || ''
+            })
         } else {
             setEditingProject(null)
-            setFormData({ code: '', name: '' })
+            setFormData(initialFormData)
         }
         setShowForm(true)
     }
@@ -43,7 +81,7 @@ function ProjectManagement() {
     const handleCloseForm = () => {
         setShowForm(false)
         setEditingProject(null)
-        setFormData({ code: '', name: '' })
+        setFormData(initialFormData)
     }
 
     const handleChange = (e) => {
@@ -54,7 +92,7 @@ function ProjectManagement() {
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (!formData.code.trim() || !formData.name.trim()) {
-            alert('অনুগ্রহ করে সকল ফিল্ড পূরণ করুন')
+            alert('অনুগ্রহ করে প্রজেক্ট কোড এবং নাম পূরণ করুন')
             return
         }
 
@@ -94,6 +132,81 @@ function ProjectManagement() {
         return (
             <div className="project-management">
                 <div className="page-loading">লোড হচ্ছে...</div>
+            </div>
+        )
+    }
+
+    const renderMcqSection = (mcqNumber) => {
+        const prefix = `mcq${mcqNumber}`
+        return (
+            <div className="mcq-section" key={mcqNumber}>
+                <h4 className="mcq-title">MCQ প্রশ্ন {mcqNumber}</h4>
+                <div className="form-group">
+                    <label>প্রশ্ন</label>
+                    <textarea
+                        name={`${prefix}_question`}
+                        value={formData[`${prefix}_question`]}
+                        onChange={handleChange}
+                        placeholder={`MCQ ${mcqNumber} এর প্রশ্ন লিখুন`}
+                        rows="2"
+                    />
+                </div>
+                <div className="options-grid">
+                    <div className="form-group">
+                        <label>অপশন ক</label>
+                        <input
+                            type="text"
+                            name={`${prefix}_option_a`}
+                            value={formData[`${prefix}_option_a`]}
+                            onChange={handleChange}
+                            placeholder="অপশন ক"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>অপশন খ</label>
+                        <input
+                            type="text"
+                            name={`${prefix}_option_b`}
+                            value={formData[`${prefix}_option_b`]}
+                            onChange={handleChange}
+                            placeholder="অপশন খ"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>অপশন গ</label>
+                        <input
+                            type="text"
+                            name={`${prefix}_option_c`}
+                            value={formData[`${prefix}_option_c`]}
+                            onChange={handleChange}
+                            placeholder="অপশন গ"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>অপশন ঘ</label>
+                        <input
+                            type="text"
+                            name={`${prefix}_option_d`}
+                            value={formData[`${prefix}_option_d`]}
+                            onChange={handleChange}
+                            placeholder="অপশন ঘ"
+                        />
+                    </div>
+                </div>
+                <div className="form-group answer-select">
+                    <label>সঠিক উত্তর</label>
+                    <select
+                        name={`${prefix}_answer`}
+                        value={formData[`${prefix}_answer`]}
+                        onChange={handleChange}
+                    >
+                        <option value="">সঠিক উত্তর সিলেক্ট করুন</option>
+                        <option value="A">ক</option>
+                        <option value="B">খ</option>
+                        <option value="C">গ</option>
+                        <option value="D">ঘ</option>
+                    </select>
+                </div>
             </div>
         )
     }
@@ -146,6 +259,17 @@ function ProjectManagement() {
                             <div className="project-info">
                                 <h3 className="project-name">{project.name}</h3>
                                 <span className="project-code">{project.code}</span>
+                                {project.youtube_url && (
+                                    <span className="project-badge youtube">
+                                        <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+                                            <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+                                        </svg>
+                                        ভিডিও
+                                    </span>
+                                )}
+                                {project.mcq1_question && (
+                                    <span className="project-badge mcq">MCQ</span>
+                                )}
                                 <span className="project-date">
                                     তৈরি: {new Date(project.created_at).toLocaleDateString('bn-BD')}
                                 </span>
@@ -179,38 +303,75 @@ function ProjectManagement() {
 
             {showForm && (
                 <div className="modal-overlay" onClick={handleCloseForm}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
                             <h2>{editingProject ? 'প্রজেক্ট সম্পাদনা' : 'নতুন প্রজেক্ট'}</h2>
                             <button className="close-btn" onClick={handleCloseForm}>×</button>
                         </div>
                         <form onSubmit={handleSubmit}>
-                            <div className="form-group">
-                                <label>প্রজেক্ট কোড</label>
-                                <input
-                                    type="text"
-                                    name="code"
-                                    value={formData.code}
-                                    onChange={handleChange}
-                                    placeholder="যেমন: PROJ001"
-                                    disabled={!!editingProject}
-                                    required
-                                />
-                                {editingProject && (
-                                    <span className="field-hint">প্রজেক্ট কোড পরিবর্তন করা যাবে না</span>
-                                )}
+                            <div className="form-section">
+                                <h3 className="section-title">মৌলিক তথ্য</h3>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>প্রজেক্ট কোড</label>
+                                        <input
+                                            type="text"
+                                            name="code"
+                                            value={formData.code}
+                                            onChange={handleChange}
+                                            placeholder="যেমন: PROJ001"
+                                            disabled={!!editingProject}
+                                            required
+                                        />
+                                        {editingProject && (
+                                            <span className="field-hint">প্রজেক্ট কোড পরিবর্তন করা যাবে না</span>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>প্রজেক্ট নাম</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            placeholder="প্রজেক্টের নাম লিখুন"
+                                            required
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                            <div className="form-group">
-                                <label>প্রজেক্ট নাম</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    placeholder="প্রজেক্টের নাম লিখুন"
-                                    required
-                                />
+
+                            <div className="form-section">
+                                <h3 className="section-title">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style={{ marginRight: '8px', color: '#ff0000' }}>
+                                        <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+                                    </svg>
+                                    ইউটিউব ভিডিও
+                                </h3>
+                                <div className="form-group">
+                                    <label>ভিডিও লিংক</label>
+                                    <input
+                                        type="url"
+                                        name="youtube_url"
+                                        value={formData.youtube_url}
+                                        onChange={handleChange}
+                                        placeholder="https://www.youtube.com/watch?v=..."
+                                    />
+                                    <span className="field-hint">ইউটিউব ভিডিওর সম্পূর্ণ লিংক দিন</span>
+                                </div>
                             </div>
+
+                            <div className="form-section mcq-container">
+                                <h3 className="section-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20" style={{ marginRight: '8px' }}>
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M9 12l2 2 4-4" />
+                                    </svg>
+                                    MCQ প্রশ্ন-উত্তর (৩টি)
+                                </h3>
+                                {[1, 2, 3].map(renderMcqSection)}
+                            </div>
+
                             <div className="form-actions">
                                 <button type="button" className="btn-secondary" onClick={handleCloseForm}>
                                     বাতিল
