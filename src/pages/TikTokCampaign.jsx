@@ -28,7 +28,7 @@ const FAQ_ITEMS = [
   },
 ]
 
-function TikTokCampaign({ onBack, headerSettings, footerItems, onNavigateToLogin, onAutoLogin, onGoToDashboard }) {
+function TikTokCampaign({ onBack, headerSettings, footerItems, showFooter = true, onNavigateToLogin, onAutoLogin, onGoToDashboard }) {
   const [showRegisterPopup, setShowRegisterPopup] = useState(false)
   const [openFaqIndex, setOpenFaqIndex] = useState(null)
   const [formData, setFormData] = useState({
@@ -341,29 +341,31 @@ function TikTokCampaign({ onBack, headerSettings, footerItems, onNavigateToLogin
       </section>
 
       {/* Bottom Navigation - Dynamic */}
-      <nav className="bottom-nav">
-        {footerItems?.map((item) => (
-          <a 
-            key={item.id} 
-            href={item.link} 
-            className={`nav-item ${item.link === '/tiktok-campaign' ? 'active' : ''}`}
-            onClick={(e) => {
-              if (item.link === '/login') {
-                e.preventDefault()
-                onNavigateToLogin?.()
-              } else if (item.link === '/' || item.link === '#home') {
-                e.preventDefault()
-                onBack()
-              } else if (item.link.startsWith('#')) {
-                e.preventDefault()
-              }
-            }}
-          >
-            <span className="nav-icon">{item.icon}</span>
-            <span className="nav-label">{item.label}</span>
-          </a>
-        ))}
-      </nav>
+      {showFooter && (
+        <nav className="bottom-nav">
+          {footerItems?.map((item) => (
+            <a 
+              key={item.id} 
+              href={item.link} 
+              className={`nav-item ${item.link === '/tiktok-campaign' ? 'active' : ''}`}
+              onClick={(e) => {
+                if (item.link === '/login') {
+                  e.preventDefault()
+                  onNavigateToLogin?.()
+                } else if (item.link === '/' || item.link === '#home') {
+                  e.preventDefault()
+                  onBack()
+                } else if (item.link.startsWith('#')) {
+                  e.preventDefault()
+                }
+              }}
+            >
+              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-label">{item.label}</span>
+            </a>
+          ))}
+        </nav>
+      )}
 
       {/* Registration Modal */}
       {showRegisterPopup && (

@@ -1,0 +1,37 @@
+---
+description: Restart servers when backend or run scripts change
+alwaysApply: true
+---
+
+# Server Restart Rules
+
+## When to Restart the Backend (Node/Express on port 3001)
+
+Restart the backend server whenever you change code that the running process would not pick up automatically:
+
+- **Routes**: Any change in `server/routes/*.js` (new or modified API endpoints)
+- **Controllers**: Any change in `server/controllers/*.js`
+- **Middleware**: Any change in `server/middleware/*.js`
+- **Server entry**: Changes to `server/index.js` or `server/config/*.js`
+- **After migrations**: After running `npm run migrate` (so the app uses the new schema)
+
+Restart steps:
+
+1. Kill any process on port 3001: `lsof -ti:3001 | xargs kill -9 2>/dev/null`
+2. Start backend from project root: `cd "<project-root>" && npm run server` (run in background if needed)
+
+## When to Restart the Frontend (Vite on port 5173)
+
+Usually not required; Vite hot-reloads. Restart only if:
+
+- You change `vite.config.js` or env that affects the dev server
+- The dev server is in a bad state
+
+## After Implementing Backend Changes
+
+After adding or modifying API routes, controllers, or middleware, either:
+
+- Tell the user to restart the backend, or
+- Run the kill and start commands so the updated server is running.
+
+This avoids 404/400 errors caused by the old process not having the new routes or logic.

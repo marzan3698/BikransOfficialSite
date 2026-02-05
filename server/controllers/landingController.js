@@ -1,4 +1,6 @@
 import { query } from '../config/database.js'
+import path from 'path'
+import fs from 'fs'
 
 const DEFAULT_SERVICES_TITLE = 'সব স্বাস্থ্য সমাধান এক প্ল্যাটফর্মে'
 const DEFAULT_FEATURES_TITLE = 'কেন বিক্রান্স বেছে নেবেন?'
@@ -56,7 +58,29 @@ export async function getPublicLanding(req, res) {
   }
 }
 
+const LANDING_ICON_DIR = path.join(process.cwd(), 'public', 'uploads', 'landing')
+
 // ===== SERVICES SECTION (admin) =====
+export async function uploadServiceIcon(req, res) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Image file is required' })
+    }
+    const ext = path.extname(req.file.originalname) || '.png'
+    const newName = `icon_${Date.now()}${ext}`
+    const destPath = path.join(LANDING_ICON_DIR, newName)
+    fs.renameSync(req.file.path, destPath)
+    const iconUrl = `/uploads/landing/${newName}`
+    res.json({ success: true, url: iconUrl })
+  } catch (err) {
+    console.error('Upload service icon error:', err)
+    if (req.file?.path && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path)
+    }
+    res.status(500).json({ error: 'Failed to upload image' })
+  }
+}
+
 export async function getServicesSection(req, res) {
   try {
     const settings = await query('SELECT * FROM landing_services_settings LIMIT 1')

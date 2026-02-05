@@ -46,6 +46,7 @@ function App() {
     app_btn_link: '',
     app_btn_bg_color: '#52B788',
     show_menu_btn: true,
+    show_footer: true,
   })
   const [footerItems, setFooterItems] = useState([
     { id: 1, icon: '🏠', label: 'হোম', link: '/' },
@@ -145,6 +146,7 @@ function App() {
           ...data,
           show_search_btn: Boolean(data.show_search_btn),
           show_menu_btn: Boolean(data.show_menu_btn),
+          show_footer: data.show_footer !== undefined ? Boolean(data.show_footer) : true,
         })
       })
       .catch(() => {})
@@ -393,6 +395,7 @@ function App() {
         onBack={handleCampaignBack} 
         headerSettings={headerSettings}
         footerItems={footerItems}
+        showFooter={headerSettings.show_footer}
         onNavigateToLogin={() => setCurrentPage('login')}
         onAutoLogin={handleCampaignAutoLogin}
         onGoToDashboard={() => { window.history.pushState({}, '', '/user-profile'); setCurrentPage('dashboard') }}
@@ -525,29 +528,31 @@ function App() {
         </div>
       </section>
 
-      <nav className="bottom-nav">
-        {footerItems.map((item, index) => (
-          <a 
-            key={item.id} 
-            href={item.link} 
-            className={`nav-item ${index === 0 ? 'active' : ''}`}
-            onClick={(e) => {
-              if (item.link === '/login') {
-                e.preventDefault()
-                setCurrentPage('login')
-              } else if (item.link === '/tiktok-campaign') {
-                e.preventDefault()
-                handleNavigateToCampaign()
-              } else if (item.link === '/' || item.link === '#home') {
-                e.preventDefault()
-              }
-            }}
-          >
-            <span className="nav-icon">{item.icon}</span>
-            <span className="nav-label">{item.label}</span>
-          </a>
-        ))}
-      </nav>
+      {headerSettings.show_footer && (
+        <nav className="bottom-nav">
+          {footerItems.map((item, index) => (
+            <a 
+              key={item.id} 
+              href={item.link} 
+              className={`nav-item ${index === 0 ? 'active' : ''}`}
+              onClick={(e) => {
+                if (item.link === '/login') {
+                  e.preventDefault()
+                  setCurrentPage('login')
+                } else if (item.link === '/tiktok-campaign') {
+                  e.preventDefault()
+                  handleNavigateToCampaign()
+                } else if (item.link === '/' || item.link === '#home') {
+                  e.preventDefault()
+                }
+              }}
+            >
+              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-label">{item.label}</span>
+            </a>
+          ))}
+        </nav>
+      )}
     </div>
   )
 }

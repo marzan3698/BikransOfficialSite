@@ -1,4 +1,6 @@
 const API_BASE = '/api'
+// In dev, use backend origin for uploads so request hits the API server directly (avoids proxy 404)
+const API_ORIGIN = typeof import.meta !== 'undefined' && (import.meta.env?.VITE_API_ORIGIN ?? (import.meta.env?.DEV ? 'http://localhost:3001' : ''))
 
 function getToken() {
   return localStorage.getItem('bikrans_token')
@@ -123,6 +125,10 @@ export const adminApi = {
     method: 'PUT',
     body: JSON.stringify(data),
   }),
+  updateFooterVisibility: (showFooter) => request('/admin/theme/footer-visibility', {
+    method: 'PUT',
+    body: JSON.stringify({ show_footer: showFooter }),
+  }),
   uploadLogo: async (formData) => {
     const token = getToken()
     const headers = {}
@@ -199,6 +205,20 @@ export const adminApi = {
     method: 'PUT',
     body: JSON.stringify(data),
   }),
+  uploadLandingServiceIcon: async (formData) => {
+    const token = getToken()
+    const headers = {}
+    if (token) headers['Authorization'] = `Bearer ${token}`
+    const url = API_ORIGIN ? `${API_ORIGIN}/api/admin/landing/services/upload` : `${API_BASE}/admin/landing/services/upload`
+    const res = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(data.error || 'Image upload failed')
+    return data
+  },
   createLandingServiceItem: (data) => request('/admin/landing/services/items', {
     method: 'POST',
     body: JSON.stringify(data),

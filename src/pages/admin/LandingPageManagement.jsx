@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { adminApi } from '../../services/api'
 import './LandingPageManagement.css'
 
@@ -26,6 +26,8 @@ function LandingPageManagement() {
     sort_order: 0,
     is_active: 1,
   })
+  const [serviceIconUploading, setServiceIconUploading] = useState(false)
+  const serviceIconInputRef = useRef(null)
 
   // Features
   const [featuresTitle, setFeaturesTitle] = useState('')
@@ -269,6 +271,26 @@ function LandingPageManagement() {
       ...prev,
       [name]: type === 'checkbox' ? (checked ? 1 : 0) : value,
     }))
+  }
+
+  const handleServiceIconUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setServiceIconUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('icon', file)
+      const data = await adminApi.uploadLandingServiceIcon(formData)
+      if (data?.url) {
+        setServicesForm((p) => ({ ...p, icon: data.url, is_image: 1 }))
+      }
+    } catch (err) {
+      alert(err.message || 'ছবি আপলোড ব্যর্থ')
+    } finally {
+      setServiceIconUploading(false)
+      e.target.value = ''
+      if (serviceIconInputRef.current) serviceIconInputRef.current.value = ''
+    }
   }
 
   if (loading) {
@@ -547,13 +569,35 @@ function LandingPageManagement() {
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h2>{servicesModal === 'create' ? 'সার্ভিস আইটেম যোগ করুন' : 'সার্ভিস সম্পাদনা'}</h2>
             <form onSubmit={servicesModal === 'create' ? handleServicesSubmitCreate : handleServicesSubmitEdit}>
+              <div className="landing-icon-instructions">
+                <strong>ছবির নির্দেশনা:</strong> বর্গাকার বা ২০০×২০০ পিক্সেল সুবিধাজনক। সর্বোচ্চ ৫০০ KB। ফরম্যাট: JPG, PNG অথবা WebP।
+              </div>
+              <div className="form-group">
+                <label>কম্পিউটার থেকে ছবি আপলোড করুন</label>
+                <div className="landing-upload-row">
+                  <input
+                    ref={serviceIconInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handleServiceIconUpload}
+                    disabled={serviceIconUploading}
+                    className="landing-file-input"
+                  />
+                  {serviceIconUploading && <span className="landing-upload-status">আপলোড হচ্ছে...</span>}
+                  {servicesForm.is_image && servicesForm.icon && (
+                    <span className="landing-current-preview">
+                      বর্তমান: <img src={servicesForm.icon} alt="" className="landing-preview-thumb" />
+                    </span>
+                  )}
+                </div>
+              </div>
               <div className="form-group">
                 <label>আইকন (ইমোজি অথবা ছবির URL)</label>
                 <input
                   type="text"
                   value={servicesForm.icon}
                   onChange={(e) => setServicesForm((p) => ({ ...p, icon: e.target.value }))}
-                  placeholder="💼 বা /zdia.png"
+                  placeholder="💼 বা /zdia.png অথবা উপরে থেকে আপলোড করুন"
                   required
                 />
               </div>
@@ -564,7 +608,7 @@ function LandingPageManagement() {
                     checked={!!servicesForm.is_image}
                     onChange={(e) => setServicesForm((p) => ({ ...p, is_image: e.target.checked ? 1 : 0 }))}
                   />
-                  ছবি হিসেবে ব্যবহার করুন (URL)
+                  ছবি হিসেবে ব্যবহার করুন (URL/আপলোড)
                 </label>
               </div>
               <div className="form-group">

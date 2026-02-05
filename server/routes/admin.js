@@ -20,6 +20,7 @@ import {
   getHeaderSettings,
   updateHeaderSettings,
   uploadLogo as uploadLogoController,
+  updateFooterVisibility,
   getAdminFooterNavItems,
   createFooterNavItem,
   updateFooterNavItem,
@@ -39,6 +40,7 @@ import {
 import {
   getServicesSection,
   updateServicesSettings,
+  uploadServiceIcon,
   createServiceItem,
   updateServiceItem,
   deleteServiceItem,
@@ -54,7 +56,7 @@ import {
 } from '../controllers/landingController.js'
 import { authMiddleware } from '../middleware/auth.js'
 import { requireAdmin, requireAdminOrManager } from '../middleware/roleCheck.js'
-import { uploadSlider, uploadLogo, uploadTaskAttachment } from '../middleware/upload.js'
+import { uploadSlider, uploadLogo, uploadTaskAttachment, uploadLandingServiceIcon } from '../middleware/upload.js'
 
 const router = express.Router()
 
@@ -101,6 +103,7 @@ router.post('/theme/header/logo', requireAdminOrManager, (req, res, next) => {
   })
 }, uploadLogoController)
 
+router.put('/theme/footer-visibility', requireAdminOrManager, updateFooterVisibility)
 router.get('/theme/footer', requireAdminOrManager, getAdminFooterNavItems)
 router.post('/theme/footer', requireAdminOrManager, createFooterNavItem)
 router.put('/theme/footer/reorder', requireAdminOrManager, reorderFooterNavItems)
@@ -125,6 +128,12 @@ router.post('/tasks/:id/comments', requireAdminOrManager, addTaskCommentAdmin)
 // Landing page design (Theme Design > ল্যান্ডিং পেজ ডিজাইন)
 router.get('/landing/services', requireAdminOrManager, getServicesSection)
 router.put('/landing/services', requireAdminOrManager, updateServicesSettings)
+router.post('/landing/services/upload', requireAdminOrManager, (req, res, next) => {
+  uploadLandingServiceIcon(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message || 'Image upload failed' })
+    next()
+  })
+}, uploadServiceIcon)
 router.post('/landing/services/items', requireAdminOrManager, createServiceItem)
 router.put('/landing/services/items/:id', requireAdminOrManager, updateServiceItem)
 router.delete('/landing/services/items/:id', requireAdminOrManager, deleteServiceItem)

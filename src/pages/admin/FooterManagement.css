@@ -4,6 +4,30 @@
   padding: 24px;
 }
 
+.footer-visibility-bar {
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: rgba(22, 27, 34, 0.6);
+  border: 1px solid #30363d;
+  border-radius: 8px;
+}
+
+.footer-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #e6edf3;
+}
+
+.footer-toggle-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #238636;
+  cursor: pointer;
+}
+
 .icon-cell {
   font-size: 24px;
   text-align: center;

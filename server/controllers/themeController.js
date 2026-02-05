@@ -31,6 +31,7 @@ export async function getHeaderSettings(req, res) {
         app_btn_link: '',
         app_btn_bg_color: '#52B788',
         show_menu_btn: 1,
+        show_footer: 1,
       })
     }
     res.json(rows[0])
@@ -42,6 +43,7 @@ export async function getHeaderSettings(req, res) {
 
 export async function updateHeaderSettings(req, res) {
   try {
+    const body = req.body || {}
     const {
       logo_image,
       logo_height,
@@ -52,7 +54,8 @@ export async function updateHeaderSettings(req, res) {
       app_btn_link,
       app_btn_bg_color,
       show_menu_btn,
-    } = req.body
+    } = body
+    const show_footer = body.show_footer !== undefined ? body.show_footer : body.showFooter
 
     const updates = []
     const params = []
@@ -93,6 +96,10 @@ export async function updateHeaderSettings(req, res) {
       updates.push('show_menu_btn = ?')
       params.push(show_menu_btn ? 1 : 0)
     }
+    if (show_footer !== undefined) {
+      updates.push('show_footer = ?')
+      params.push(show_footer ? 1 : 0)
+    }
 
     if (updates.length === 0) {
       return res.status(400).json({ error: 'No fields to update' })
@@ -105,8 +112,8 @@ export async function updateHeaderSettings(req, res) {
       // Insert new settings
       await query(`
         INSERT INTO header_settings 
-        (logo_image, logo_height, header_height, header_bg_color, show_search_btn, app_btn_text, app_btn_link, app_btn_bg_color, show_menu_btn)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (logo_image, logo_height, header_height, header_bg_color, show_search_btn, app_btn_text, app_btn_link, app_btn_bg_color, show_menu_btn, show_footer)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, [
         logo_image || '/BIKRANS-FINAL.png',
         logo_height || 36,
@@ -117,6 +124,7 @@ export async function updateHeaderSettings(req, res) {
         app_btn_link || '',
         app_btn_bg_color || '#52B788',
         show_menu_btn !== undefined ? (show_menu_btn ? 1 : 0) : 1,
+        show_footer !== undefined ? (show_footer ? 1 : 0) : 1,
       ])
     } else {
       // Update existing settings
@@ -168,6 +176,30 @@ export async function uploadLogo(req, res) {
       fs.unlinkSync(req.file.path)
     }
     res.status(500).json({ error: 'Failed to upload logo' })
+  }
+}
+
+// ===== FOOTER VISIBILITY (enable/disable footer on site) =====
+export async function updateFooterVisibility(req, res) {
+  try {
+    const body = req.body || {}
+    let show = body.show_footer !== undefined ? body.show_footer : body.showFooter
+    if (show === undefined) show = true
+    const value = show === true || show === 1 || show === '1' || show === 'true' ? 1 : 0
+
+    const rows = await query('SELECT id FROM header_settings LIMIT 1')
+    if (rows.length === 0) {
+      await query(`
+        INSERT INTO header_settings (logo_image, show_footer) VALUES (?, ?)
+      `, ['/BIKRANS-FINAL.png', value])
+    } else {
+      await query('UPDATE header_settings SET show_footer = ? WHERE id = ?', [value, rows[0].id])
+    }
+    const [updated] = await query('SELECT show_footer FROM header_settings LIMIT 1')
+    res.json({ show_footer: Boolean(updated?.show_footer) })
+  } catch (err) {
+    console.error('Update footer visibility error:', err)
+    res.status(500).json({ error: 'Failed to update footer visibility' })
   }
 }
 

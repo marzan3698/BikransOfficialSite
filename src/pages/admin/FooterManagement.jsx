@@ -7,6 +7,7 @@ function FooterManagement() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [modal, setModal] = useState(null)
+  const [showFooter, setShowFooter] = useState(true)
   const [formData, setFormData] = useState({
     icon: '',
     label: '',
@@ -17,7 +18,17 @@ function FooterManagement() {
 
   useEffect(() => {
     loadItems()
+    loadFooterVisibility()
   }, [])
+
+  const loadFooterVisibility = async () => {
+    try {
+      const data = await adminApi.getHeaderSettings()
+      setShowFooter(data.show_footer !== undefined ? Boolean(data.show_footer) : true)
+    } catch {
+      setShowFooter(true)
+    }
+  }
 
   const loadItems = async () => {
     setLoading(true)
@@ -95,6 +106,17 @@ function FooterManagement() {
     }
   }
 
+  const handleToggleFooter = async (e) => {
+    const checked = e.target.checked
+    setShowFooter(checked)
+    try {
+      await adminApi.updateFooterVisibility(checked)
+    } catch (err) {
+      setShowFooter(!checked)
+      alert(err.message || 'Failed to update')
+    }
+  }
+
   const handleMove = async (index, direction) => {
     const newItems = [...items]
     const swap = direction === 'up' ? index - 1 : index + 1
@@ -113,6 +135,17 @@ function FooterManagement() {
 
   return (
     <div className="footer-management">
+      <div className="footer-visibility-bar">
+        <label className="footer-toggle-label">
+          <input
+            type="checkbox"
+            checked={showFooter}
+            onChange={handleToggleFooter}
+            className="footer-toggle-checkbox"
+          />
+          <span>সাইটে ফুটার দেখান (Enable footer)</span>
+        </label>
+      </div>
       <div className="page-header">
         <h1 className="page-title">Footer Management</h1>
         <button className="btn-primary" onClick={handleCreate}>Add Item</button>

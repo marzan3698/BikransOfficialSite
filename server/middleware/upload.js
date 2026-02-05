@@ -106,3 +106,32 @@ export const uploadTaskAttachment = multer({
   fileFilter: taskFileFilter,
   limits: { fileSize: TASK_MAX_SIZE },
 }).single('file')
+
+// Landing service icon (small icons for service cards)
+const LANDING_UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'landing')
+const LANDING_ICON_MAX_SIZE = 500 * 1024 // 500KB
+const LANDING_ICON_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
+if (!fs.existsSync(LANDING_UPLOAD_DIR)) {
+  fs.mkdirSync(LANDING_UPLOAD_DIR, { recursive: true })
+}
+
+const landingIconStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, LANDING_UPLOAD_DIR),
+  filename: (req, file, cb) =>
+    cb(null, `temp_${Date.now()}${path.extname(file.originalname) || '.png'}`),
+})
+
+const landingIconFilter = (req, file, cb) => {
+  if (LANDING_ICON_TYPES.includes(file.mimetype)) {
+    cb(null, true)
+  } else {
+    cb(new Error('Only JPG, PNG, WebP allowed'), false)
+  }
+}
+
+export const uploadLandingServiceIcon = multer({
+  storage: landingIconStorage,
+  fileFilter: landingIconFilter,
+  limits: { fileSize: LANDING_ICON_MAX_SIZE },
+}).single('icon')
