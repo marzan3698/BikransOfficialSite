@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { slidersApi, authApi, themeApi, landingApi } from './services/api'
 import './App.css'
 import Login from './pages/Login'
-import Register from './pages/Register'
+import ChatRegister from './pages/ChatRegister'
 import Dashboard from './pages/Dashboard'
 import TikTokCampaign from './pages/TikTokCampaign'
 import UserTasks from './pages/UserTasks'
@@ -332,7 +332,7 @@ function App() {
       return null
     }
     return (
-      <Register
+      <ChatRegister
         onRegisterSuccess={handleRegisterSuccess}
         onNavigateToLogin={handleNavigateToLogin}
       />

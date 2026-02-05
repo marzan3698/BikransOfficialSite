@@ -18,7 +18,8 @@ const PORT = process.env.PORT || 3001
 
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
 app.use(express.json())
-app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')))
+// Serve uploads from the project root public directory
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')))
 
 app.use('/api/auth', authRoutes)
 app.use('/api/admin', adminRoutes)

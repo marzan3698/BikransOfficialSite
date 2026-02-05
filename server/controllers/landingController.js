@@ -36,25 +36,36 @@ export async function getPublicLanding(req, res) {
       },
       cta: cta
         ? {
-            heading: cta.heading,
-            subtitle: cta.subtitle,
-            primary_btn_text: cta.primary_btn_text,
-            primary_btn_link: cta.primary_btn_link,
-            secondary_btn_text: cta.secondary_btn_text,
-            secondary_btn_link: cta.secondary_btn_link,
-          }
+          heading: cta.heading,
+          subtitle: cta.subtitle,
+          primary_btn_text: cta.primary_btn_text,
+          primary_btn_link: cta.primary_btn_link,
+          secondary_btn_text: cta.secondary_btn_text,
+          secondary_btn_link: cta.secondary_btn_link,
+        }
         : {
-            heading: 'আজই শুরু করুন',
-            subtitle: 'স্বাস্থ্য ও আয়ের নতুন যাত্রা',
-            primary_btn_text: '📞 কল করুন',
-            primary_btn_link: '+8801700000000',
-            secondary_btn_text: '💬 WhatsApp',
-            secondary_btn_link: '8801700000000',
-          },
+          heading: 'আজই শুরু করুন',
+          subtitle: 'স্বাস্থ্য ও আয়ের নতুন যাত্রা',
+          primary_btn_text: '📞 কল করুন',
+          primary_btn_link: '+8801700000000',
+          secondary_btn_text: '💬 WhatsApp',
+          secondary_btn_link: '8801700000000',
+        },
     })
   } catch (err) {
     console.error('Get public landing error:', err)
     res.status(500).json({ error: 'Failed to get landing content' })
+  }
+}
+
+
+export async function getPublicProjects(req, res) {
+  try {
+    const projects = await query('SELECT id, code, name FROM projects ORDER BY created_at DESC')
+    res.json(projects)
+  } catch (err) {
+    console.error('Get public projects error:', err)
+    res.status(500).json({ error: 'Failed to get projects' })
   }
 }
 

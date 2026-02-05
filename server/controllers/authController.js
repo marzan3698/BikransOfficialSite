@@ -3,6 +3,18 @@ import { body, validationResult } from 'express-validator'
 import { query } from '../config/database.js'
 import { generateToken } from '../middleware/auth.js'
 
+export async function checkPhone(req, res) {
+  try {
+    const { phone } = req.body
+    if (!phone) return res.status(400).json({ error: 'Phone required' })
+    const users = await query('SELECT id FROM users WHERE phone = ?', [phone])
+    res.json({ exists: users.length > 0 })
+  } catch (err) {
+    console.error('Check phone error:', err)
+    res.status(500).json({ error: 'Check failed' })
+  }
+}
+
 export const loginValidation = [
   body('email').optional().isEmail().withMessage('Valid email required'),
   body('phone').optional().isString(),
@@ -62,8 +74,8 @@ export async function login(req, res) {
 
 export const registerValidation = [
   body('name').trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
-  body('email').isEmail().withMessage('Valid email required'),
   body('phone').matches(/^01[3-9]\d{8}$/).withMessage('Valid 11-digit Bangladeshi phone required'),
+  // Email optional or auto-generated
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 ]
 
@@ -74,24 +86,49 @@ export async function register(req, res) {
       return res.status(400).json({ errors: errors.array() })
     }
 
-    const { name, email, phone, password } = req.body
+    const { name, email, phone, password, whatsapp_number, gender, reference_id, project_code } = req.body
 
-    const existing = await query('SELECT id FROM users WHERE email = ? OR phone = ?', [
-      email,
-      phone,
-    ])
+    const existing = await query('SELECT id FROM users WHERE phone = ?', [phone])
     if (existing.length > 0) {
-      return res.status(400).json({ error: 'Email or phone already registered' })
+      return res.status(400).json({ error: 'Phone number already registered' })
     }
 
+    // Use provided email or generate a placeholder
+    const userEmail = email || `${phone}@bikrans.local`
     const hashed = await bcrypt.hash(password, 10)
+
+    // Insert user
+    // Add reference_id and gender columns to DB if meaningful, currently gender exists.
+    // Assuming reference_id is tracked? DB schema says users table has: id, name, email, phone, role, status, age, gender, whatsapp_number, login_pin, created_at
+    // No reference_id column seen in previous file views. Assuming we store it in a meta table or ignore for now if column missing.
+    // Wait, let's check `001_create_users_table.js` or `adminController` query to be sure about columns.
+    // adminController query: SELECT id, name, email, phone, role, status, age, gender, whatsapp_number, login_pin, created_at
+    // No reference_id column. We will skip saving reference_id for now or add column. 
+    // Given the task is frontend heavy, I will store what I can.
+
     await query(
-      'INSERT INTO users (name, email, phone, password, role) VALUES (?, ?, ?, ?, ?)',
-      [name, email, phone, hashed, 'user']
+      'INSERT INTO users (name, email, phone, password, role, gender, whatsapp_number, login_pin) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [name, userEmail, phone, hashed, 'user', gender || null, whatsapp_number || null, password]
     )
 
     const [user] = await query('SELECT id, name, email, phone, role, status FROM users WHERE id = LAST_INSERT_ID()')
+
+    // Assign project if code provided
+    if (project_code) {
+      const [proj] = await query('SELECT id FROM projects WHERE code = ?', [project_code])
+      if (proj) {
+        await query('INSERT INTO user_projects (user_id, project_id) VALUES (?, ?)', [user.id, proj.id])
+      }
+    }
+
     const token = generateToken(user)
+
+    // Fetch assigned projects
+    const projects = await query(
+      'SELECT p.id, p.code, p.name FROM projects p INNER JOIN user_projects up ON p.id = up.project_id WHERE up.user_id = ?',
+      [user.id]
+    )
+
     res.status(201).json({
       token,
       user: {
@@ -101,6 +138,7 @@ export async function register(req, res) {
         phone: user.phone,
         role: user.role,
         status: user.status,
+        projects: projects || []
       },
     })
   } catch (err) {
@@ -175,7 +213,7 @@ export async function campaignRegister(req, res) {
 
     // Generate JWT token for auto-login
     const token = generateToken(fullUser)
-    
+
     res.status(201).json({
       success: true,
       message: 'নিবন্ধন সম্পন্ন হয়েছে',

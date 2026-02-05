@@ -36,6 +36,10 @@ export const themeApi = {
   getFooter: () => request('/theme/footer'),
 }
 
+export const publicApi = {
+  getProjects: () => request('/public/projects'),
+}
+
 export const landingApi = {
   getPublic: () => request('/public/landing'),
 }
@@ -57,6 +61,10 @@ export const authApi = {
   campaignRegister: (data) => request('/auth/campaign-register', {
     method: 'POST',
     body: JSON.stringify(data),
+  }),
+  checkPhone: (phone) => request('/auth/check-phone', {
+    method: 'POST',
+    body: JSON.stringify({ phone }),
   }),
   logout: () => request('/auth/logout', { method: 'POST' }),
   me: () => request('/auth/me'),
