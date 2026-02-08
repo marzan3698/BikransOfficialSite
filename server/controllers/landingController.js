@@ -59,9 +59,40 @@ export async function getPublicLanding(req, res) {
 }
 
 
+// Build mcq_data array from mcq1/mcq2/mcq3 columns for ChatRegister
+function buildMcqData(row) {
+  const items = []
+  for (let i = 1; i <= 3; i++) {
+    const q = row[`mcq${i}_question`]
+    if (!q) continue
+    items.push({
+      question: q,
+      optionA: row[`mcq${i}_option_a`] || '',
+      optionB: row[`mcq${i}_option_b`] || '',
+      optionC: row[`mcq${i}_option_c`] || '',
+      optionD: row[`mcq${i}_option_d`] || '',
+      answer: (row[`mcq${i}_answer`] || 'a').toLowerCase(),
+    })
+  }
+  return items
+}
+
 export async function getPublicProjects(req, res) {
   try {
-    const projects = await query('SELECT id, code, name FROM projects ORDER BY created_at DESC')
+    const rows = await query(`
+      SELECT id, code, name, youtube_url,
+        mcq1_question, mcq1_option_a, mcq1_option_b, mcq1_option_c, mcq1_option_d, mcq1_answer,
+        mcq2_question, mcq2_option_a, mcq2_option_b, mcq2_option_c, mcq2_option_d, mcq2_answer,
+        mcq3_question, mcq3_option_a, mcq3_option_b, mcq3_option_c, mcq3_option_d, mcq3_answer
+      FROM projects ORDER BY created_at DESC
+    `)
+    const projects = rows.map((row) => ({
+      id: row.id,
+      code: row.code,
+      name: row.name,
+      youtube_url: row.youtube_url,
+      mcq_data: JSON.stringify(buildMcqData(row)),
+    }))
     res.json(projects)
   } catch (err) {
     console.error('Get public projects error:', err)
